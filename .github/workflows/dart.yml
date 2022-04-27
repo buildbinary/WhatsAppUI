@@ -1,27 +1,34 @@
-name: Dart CI
+name: Test, Build and Release apk
 
-on: [push]
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
 
 jobs:
   build:
-
+    name: Build APK
     runs-on: ubuntu-latest
-
-    container:
-      image:  google/dart:latest
-
     steps:
-    - uses: actions/checkout@v1
+    # Setup Java environment in order to build the Android app.
+    - uses: actions/checkout@v2
+      with:
+        lfs: true
+    # Pull lfs objects
+    - run: git lfs checkout
     - uses: actions/setup-java@v1
       with:
         java-version: '12.x'
+    # Setup the flutter environment.
     - uses: subosito/flutter-action@v2
       with:
-        flutter-version: '1.7.x' # you can use 1.7
-        channel: 'dev' # optional, default to: 'stable'
+        channel: 'stable' # 'dev', 'alpha', default to: 'stable'
     - run: flutter pub get
-    - run: flutter test
-    - run: flutter build apk
+    - run: flutter build apk --target-platform android-arm,android-arm64,android-x64 --split-per-abi
+    # Upload the 3 separate apks as artifacts
     - uses: actions/upload-artifact@v2
       with:
         name: release
