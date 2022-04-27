@@ -1,4 +1,4 @@
-name: Test, Build and Release apk
+name: Build and Release apk
 
 on:
   push:
@@ -27,9 +27,8 @@ jobs:
       with:
         channel: 'stable' # 'dev', 'alpha', default to: 'stable'
     - run: flutter pub get
-    - run: flutter build apk --target-platform android-arm,android-arm64,android-x64 --split-per-abi
-    # Upload the 3 separate apks as artifacts
+    - run: flutter build apk
     - uses: actions/upload-artifact@v2
       with:
         name: release
-        path: build/app/outputs/apk/release/app-*.apk
+        path: build/app/outputs/apk/release/app.apk
